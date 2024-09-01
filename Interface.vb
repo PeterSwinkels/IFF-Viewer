@@ -26,14 +26,14 @@ Public Class InterfaceWindow
 
          If GetCommandLineArgs().Count > 1 Then
             IFFFile(IFFFilePath:=GetCommandLineArgs().Last)
-            DisplayIFFFile()
+            DisplayIFFFile(DataBox)
          End If
 
          Me.Text = ProgramInformation()
 
          ToolTip.SetToolTip(DataBox, "Drag an IFF file into this window to display its contents.")
       Catch ExceptionO As Exception
-         HandleError(ExceptionO)
+         DisplayError(ExceptionO)
       End Try
    End Sub
 
@@ -42,10 +42,10 @@ Public Class InterfaceWindow
       Try
          If e.Data.GetDataPresent(DataFormats.FileDrop) Then
             IFFFile(IFFFilePath:=DirectCast(e.Data.GetData(DataFormats.FileDrop), String()).First)
-            DisplayIFFFile()
+            DisplayIFFFile(DataBox)
          End If
       Catch ExceptionO As Exception
-         HandleError(ExceptionO)
+         DisplayError(ExceptionO)
       End Try
    End Sub
 
@@ -54,33 +54,39 @@ Public Class InterfaceWindow
       Try
          If e.Data.GetDataPresent(DataFormats.FileDrop) Then e.Effect = DragDropEffects.All
       Catch ExceptionO As Exception
-         HandleError(ExceptionO)
+         DisplayError(ExceptionO)
       End Try
    End Sub
 
-   'This procedure displays the current IFF file's contents.
-   Private Sub DisplayIFFFile()
+   'This procedure displays informationa about this program.
+   Private Sub InformationMenu_Click(sender As Object, e As EventArgs) Handles InformationMenu.Click
       Try
-         With New StringBuilder
-            .Append($"Path: {IFFFile().Path}{NewLine}")
-            .Append($"IFF file size: {IFFFile().IFFFileSize} byte(s){NewLine}")
-            .Append($"IFF identifier: {IFFFile().IFFIdentifier}{NewLine}")
-            .Append($"IFF type: {IFFFile().IFFType}{NewLine}")
-            .Append(NewLine)
-            For Each IFFRecord As IFFRecordStr In IFFFile().IFFRecords
-               .Append($"Identifier: {IFFRecord.Identifier}{NewLine}")
-               .Append($"Offset: {IFFRecord.Offset}{NewLine}")
-               .Append($"Size: {IFFRecord.Size}  byte(s){NewLine}")
-               .Append($"Data:{NewLine}")
-               Array.ForEach(IFFRecord.Data, Sub(ByteV As Byte) .Append($"{$"{ByteV:X2}",-3}"))
-               .Append(NewLine)
-               .Append(NewLine)
-            Next IFFRecord
+         MessageBox.Show(My.Application.Info.Description, ProgramInformation(), MessageBoxButtons.OK, MessageBoxIcon.Information)
+      Catch ExceptionO As Exception
+         DisplayError(ExceptionO)
+      End Try
+   End Sub
 
-            DataBox.Text = .ToString()
+   'This procedure displays the open file dialog box.
+   Private Sub OpenFileMenu_Click(sender As Object, e As EventArgs) Handles OpenFileMenu.Click
+      Try
+         With New OpenFileDialog()
+            If .ShowDialog() = DialogResult.OK Then
+               IFFFile(IFFFilePath:= .FileName)
+               DisplayIFFFile(DataBox)
+            End If
          End With
       Catch ExceptionO As Exception
-         HandleError(ExceptionO)
+         DisplayError(ExceptionO)
+      End Try
+   End Sub
+
+   'This procedure closes this program's main window.
+   Private Sub QuitMenu_Click(sender As Object, e As EventArgs) Handles QuitMenu.Click
+      Try
+         Me.Close()
+      Catch ExceptionO As Exception
+         DisplayError(ExceptionO)
       End Try
    End Sub
 End Class

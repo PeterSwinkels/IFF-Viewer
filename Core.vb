@@ -11,8 +11,8 @@ Imports System.Windows.Forms
 
 'This module contains this program's core procedures.
 Public Module CoreModule
-   'This procudure handles any errors that occur.
-   Public Sub HandleError(ExceptionO As Exception)
+   'This procudure displays any errors that occur.
+   Public Sub DisplayError(ExceptionO As Exception)
       Try
          If MessageBox.Show(ExceptionO.ToString(), My.Application.Info.Title, MessageBoxButtons.OKCancel, MessageBoxIcon.Error) = DialogResult.Cancel Then Application.Exit()
       Catch
@@ -29,7 +29,7 @@ Public Module CoreModule
 
          Return BitConverter.ToInt32(Bytes, 0)
       Catch ExceptionO As Exception
-         HandleError(ExceptionO)
+         DisplayError(ExceptionO)
       End Try
 
       Return Nothing
@@ -39,10 +39,10 @@ Public Module CoreModule
    Public Function ProgramInformation() As String
       Try
          With My.Application.Info
-            Return $"{ .Title} v{ .Version} - by: { .CompanyName}"
+            Return $"{ .Title} v{ .Version} - by: { .CompanyName} { .Copyright}"
          End With
       Catch ExceptionO As Exception
-         HandleError(ExceptionO)
+         DisplayError(ExceptionO)
       End Try
 
       Return Nothing
